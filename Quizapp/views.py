@@ -1,10 +1,9 @@
 from django.shortcuts import render,redirect
-from .models import NewUser,SportsQuestion as sports ,PlantsAndAnimalQuestion as plantsAndanimal,ZoologyQuestion as zoology, HistoryQuestion as history, CurrentAffairsQuestion as currentAffairs,Feedback,UserResult
+from .models import *
 import random as r
 from json import dumps
 from django.http import JsonResponse
-
-# Create your views here.
+from django.core.paginator import Paginator
 
 def home(request):
     if request.method == 'POST':
@@ -13,86 +12,117 @@ def home(request):
         user.save()
         current_user = NewUser.objects.last().pk
         request.session['uid'] = current_user
-        return redirect('questions')
+        return redirect('categories')
     return render(request,'home.html')
 
+def catagory_page(request):
+    context= {}
+    categories = Category.objects.all()
+    context['categories'] = categories
+    return render(request, 'category.html', context=context)
+
+
+def question_collections(request, category_id=None):
+    context = {}
+    if category_id:
+        questions = Question.objects.filter(category=category_id)
+        paginator = Paginator(questions, 10)
+
+        context['category'] = category_id
+        context['paginator'] = paginator
+        return render(request, 'question_collections.html', context=context)
+    else: 
+        return redirect('categories')
 
 # Question Page
-def questions(request):
+def questions(request, category_id=None):
+    context = {}
     current_userid = request.session.get('uid')
 
     # Checking for currend user
     if current_userid:
-        current_user_name = NewUser.objects.get(pk=current_userid).user_name
-              
-        questions = []
-        catagery = [sports,plantsAndanimal,zoology,history,currentAffairs]
-        for i in range(0,5):
-            # Find the Random no
-            random_no = r.randrange(1,20)
-            random_question_no = catagery[i].objects.get(question_no=random_no)
-            # Get the question details
-            question_detail = {
-                    'catagery' : random_question_no.catagery,
-                    'question' : random_question_no.question,
-                    'opt1' : random_question_no.opt1,
-                    'opt2' : random_question_no.opt2,
-                    'opt3' : random_question_no.opt3,
-                    'opt4' : random_question_no.opt4,
-                    'correct_opt' : random_question_no.correct_opt,
-                    'related_img' : str(random_question_no.related_img)
-                    }
-            question_detail['question_no'] = i + 1
-            # Add to the list
-            questions.append(question_detail)
+        current_user_name = NewUser.objects.get(pk=current_userid).user_name      
+        questions = Question.objects.filter(category=category_id)
+        paginator = Paginator(questions, 10)
+        page_number = request.GET.get("page")
+        if not page_number:
+            page_number = 1
+        page_obj = paginator.get_page(page_number)
         
         # Save user result
         if request.method == 'POST':
-            user_name = request.POST.get('user_name')
-            score = request.POST.get('score')
-            result = UserResult(user_id=current_userid,user_name=user_name,score=score)
-            result.save()
-            response = {'url' : "/result"}
-            return JsonResponse(response)
-        
-        context = {
-            'user':current_user_name,
-            'questions':questions,
-            'questions_json':dumps(questions),
-            }
+            score = 0
+            userid = request.session.get('uid')
+            user = NewUser.objects.get(id=userid)
+            category = Category.objects.get(id=category_id)
+
+            for key, value in request.POST.items():
+
+                if(key.startswith('question-')) and value:
+                    question_id = key.split('-')[1]
+
+                    # if value:
+                    question = Question.objects.get(id=question_id)
+                    correct_opt = question.correct_opt
+                    user_response, created = UserResponse.objects.get_or_create(user=user, question=question)
+                    user_response.selected_option = value
+                    user_response.save()
+                    if value == correct_opt:
+                        score += 1
+
+                user_result, created = UserResult.objects.get_or_create(user=user, category=category, question_paper_no=page_number)
+                user_result.score = score
+                user_result.save()
+
+            return redirect('result', category_id=category.id)
+
+        context['user'] = current_user_name
+        context['questions'] = page_obj
+
         return render(request,'questions.html',context=context)
+
     else:
         return redirect('home')
 
-def result(request):
+def result(request, category_id=None):
+    context = {}
     current_userid = request.session.get('uid')
-    print(current_userid)
 
     # Checking for currend user
     if current_userid:
+        user = NewUser.objects.get(id=current_userid)
+        user_result = UserResult.objects.get(user=user)
 
-        user_querry = UserResult.objects.get(user_id=current_userid)
-        print(user_querry)
-        if user_querry:
-            score = user_querry.score
-            context = {
-                'user_name' : user_querry.user_name,
-                'score' : score
-                }
-        else:
-            return redirect('home')
-        
-        if request.method == 'POST':
-            user_id = user_querry.user_id
-            user_name = request.POST.get('user_name')
-            feedback = request.POST.get('feedback')
-            feedback = Feedback(user_id=user_id,user_name=user_name,feedback=feedback)
-            feedback.save()
-            return redirect('home')
+        if not user_result:
+            return redirect('categories')
+
+        questions = Question.objects.filter(category=category_id)
+        paginator = Paginator(questions, 10)
+        page_number = user_result.question_paper_no
+        page_obj = paginator.get_page(page_number)
+
+        user_responses = UserResponse.objects.filter(user=user, question__in=questions).select_related('question')
+        user_response_dict = {response.question.id : response for response in user_responses}
+
+        context['user_result'] = user_result
+        context['user_responses'] = user_responses
+        context['user_response_dict'] = user_response_dict
+        context['user'] = current_userid
+        context['questions'] = page_obj
+        return render(request,'result.html',context=context)
     else:
         return redirect('home')
-    return render(request,'result.html',context=context)
 
+def AddFeedback(request):
+    current_userid = request.session.get('uid')
+
+    if request.method == 'POST':
+        if current_userid:
+            user = NewUser.objects.get(id=current_userid)
+            feedback = request.POST.get('feedback')
+            feedback = Feedback(user=user, feedback=feedback)
+            feedback.save()
+    return redirect('categories')
 
 def FeedbackResult(request):
     data = Feedback.objects.all()

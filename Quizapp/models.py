@@ -1,79 +1,45 @@
 from django.db import models
 
-# Create your models here.
-
-
 class NewUser(models.Model):
     user_name = models.CharField(max_length=50,null=True)
+
+    def __str__(self):
+        return self.user_name
+
+class Category(models.Model):
+    name = models.CharField(max_length=255)
+    image = models.ImageField(upload_to="caategory/related_images/",null=True, blank=True)
+
+    def __str__(self):
+        return self.name
     
-# Sports Questions
-class SportsQuestion(models.Model):
-    catagery = models.CharField(max_length=50,null=True,default='Sports')
-    question_no = models.IntegerField(null=True)
+class Question(models.Model):
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
     question = models.TextField(max_length=500,null=True)
     opt1 = models.CharField(max_length=80,null=True)
     opt2 = models.CharField(max_length=80,null=True)
     opt3 = models.CharField(max_length=80,null=True)
     opt4 = models.CharField(max_length=80,null=True)
     correct_opt = models.CharField(max_length=80,null=True)
-    related_img = models.ImageField(upload_to="questions/related_images/sports",null=True)
 
-# Plantss and Animal Questions
-class PlantsAndAnimalQuestion(models.Model):
-    catagery = models.CharField(max_length=50,null=True,default='Plants_and_cuAnimal')
-    question_no = models.IntegerField(null=True)
-    question = models.TextField(max_length=500,null=True)
-    opt1 = models.CharField(max_length=80,null=True)
-    opt2 = models.CharField(max_length=80,null=True)
-    opt3 = models.CharField(max_length=80,null=True)
-    opt4 = models.CharField(max_length=80,null=True)
-    correct_opt = models.CharField(max_length=80,null=True)
-    related_img = models.ImageField(upload_to="questions/related_images/plants_and_animal",null=True)
-   
-# Zoology Questions
-class ZoologyQuestion(models.Model):
-    catagery = models.CharField(max_length=50,null=True,default='Zoology')
-    question_no = models.IntegerField(null=True)
-    question = models.TextField(max_length=500,null=True)
-    opt1 = models.CharField(max_length=80,null=True)
-    opt2 = models.CharField(max_length=80,null=True)
-    opt3 = models.CharField(max_length=80,null=True)
-    opt4 = models.CharField(max_length=80,null=True)
-    correct_opt = models.CharField(max_length=80,null=True)
-    related_img = models.ImageField(upload_to="questions/related_images/zoology",null=True)
-
-# History Questions   
-class HistoryQuestion(models.Model):
-    catagery = models.CharField(max_length=50,null=True,default='History')
-    question_no = models.IntegerField(null=True)
-    question = models.TextField(max_length=500,null=True)
-    opt1 = models.CharField(max_length=80,null=True)
-    opt2 = models.CharField(max_length=80,null=True)
-    opt3 = models.CharField(max_length=80,null=True)
-    opt4 = models.CharField(max_length=80,null=True)
-    correct_opt = models.CharField(max_length=80,null=True)
-    related_img = models.ImageField(upload_to="questions/related_images/history",null=True)
-  
-# Current Affairs Questions
-class CurrentAffairsQuestion(models.Model):
-    catagery = models.CharField(max_length=50,null=True,default='Current_Affairs')
-    question_no = models.IntegerField(null=True)
-    question = models.TextField(max_length=500,null=True)
-    opt1 = models.CharField(max_length=80,null=True)
-    opt2 = models.CharField(max_length=80,null=True)
-    opt3 = models.CharField(max_length=80,null=True)
-    opt4 = models.CharField(max_length=80,null=True)
-    correct_opt = models.CharField(max_length=80,null=True)
-    related_img = models.ImageField(upload_to="questions/related_images/current_affairs",null=True)
+    def __str__(self):
+        return self.question
+ 
+class UserResponse(models.Model):
+    user = models.ForeignKey(NewUser, models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    selected_option = models.CharField(max_length=255)
+    submitted_at = models.DateTimeField(auto_now_add=True)
     
 # User Results
 class UserResult(models.Model):
-    user_id = models.BigIntegerField(null=True)
-    user_name = models.CharField(max_length=50,null=True)
+    user = models.ForeignKey(NewUser, models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    question_paper_no = models.IntegerField()
     score = models.IntegerField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     
 # User Feeddback
 class Feedback(models.Model):
-    user_id = models.BigIntegerField(null=True) 
-    user_name = models.CharField(max_length=50,null=True)
+    user = models.ForeignKey(NewUser, models.CASCADE)
     feedback = models.CharField(max_length=50,null=True)

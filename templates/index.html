@@ -72,6 +72,11 @@
 
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <script src="{% static 'js/index.js' %}"></script>
+    <script type="text/javascript">
+        const redirect = (url) => {
+            window.location = url;
+          }
+    </script>
     
     {% block scripts %}
     {% endblock scripts %}
