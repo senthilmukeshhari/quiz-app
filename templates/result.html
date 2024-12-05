@@ -263,7 +263,7 @@
                     {% get_style user_response_dict question question.opt1  %}
                     ">
                         <input type="radio" class="form-check-input" disabled
-                        {% option user_response_dict question question.opt1  %}
+                        {% option user_response_dict question question.opt1 %}
                         >
                         <label class="fs-5 px-2 ms-2">{{question.opt1}}</label>
                     </div>
@@ -274,7 +274,7 @@
                     {% get_style user_response_dict question question.opt2  %}
                     ">
                         <input type="radio" class="form-check-input" disabled
-                        {% option user_response_dict question question.opt2  %}
+                        {% option user_response_dict question question.opt2 %}
 
                         >
                         <label class="fs-5 px-2 ms-2">{{question.opt2}}</label>
@@ -283,10 +283,10 @@
 
                     <!-- Third Option -->
                     <div class="col-5 my-1 d-flex align-items-center
-                    {% get_style user_response_dict question question.opt3  %}
+                    {% get_style user_response_dict question question.opt3 %}
                     ">
                         <input type="radio" class="form-check-input" disabled
-                        {% option user_response_dict question question.opt3  %}
+                        {% option user_response_dict question question.opt3 %}
                         >
                         <label class="fs-5 px-2 ms-2">{{question.opt3}}</label>
                     </div>
@@ -294,11 +294,11 @@
 
                     <!-- Fourth Option -->
                     <div class="col-5 my-1 d-flex align-items-center
-                    {% get_style user_response_dict question question.opt4  %}
+                    {% get_style user_response_dict question question.opt4 %}
                     ">
 
                         <input type="radio" class="form-check-input" disabled
-                        {% option user_response_dict question question.opt4  %}
+                        {% option user_response_dict question question.opt4 %}
                         >
                         <label class="fs-5 px-2 ms-2">{{question.opt4}}</label>
                     </div>

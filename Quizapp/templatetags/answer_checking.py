@@ -5,22 +5,20 @@ register = template.Library()
 
 @register.simple_tag
 def get_style(user_response_dict, question, option):
-	print('Question : ', question)
-	print('user', user_response_dict)
-	print('option :', option)
 	user_responses = user_response_dict.get(question.id)
-	print('user_responses ', user_responses)
 	if user_responses:
-		if option == question.correct_opt:
+		if option.strip() == question.correct_opt.strip():
 			return 'is-valid'
-		elif user_responses.selected_option == option:
+		elif user_responses.selected_option.strip() == option.strip():
 			return 'is-invalid'
 	return ''
 
 @register.simple_tag
 def option(user_response_dict, question, option):
 	user_responses = user_response_dict.get(question.id)
+	print(user_responses)
 	if user_responses:
-		if option == user_responses.selected_option:
+		if user_responses.selected_option.strip() == option.strip():
+			print('hii')
 			return 'checked'
 	return ''

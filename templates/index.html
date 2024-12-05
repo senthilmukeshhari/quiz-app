@@ -29,7 +29,8 @@
 <body>
 
     <div
-        class="spinner w-100 position-fixed d-flex flex-column justify-content-center align-items-center bg-dark">
+        class="spinner w-100 position-fixed d-flex flex-column justify-content-center align-items-center bg-dark"
+        id='spinner'>
         <div class="logo d-flex align-items-center justify-content-centermb-2">
             <h2 class="text-danger">Quiz</h2>
             <h2 class="text-white ps-1">Hub</h2>
@@ -71,11 +72,23 @@
     {% endblock content %}
 
     <script src="{% static 'js/jquery.min.js' %}"></script>
-    <script src="{% static 'js/index.js' %}"></script>
     <script type="text/javascript">
+        const spinnerContainer = document.getElementById('spinner');
         const redirect = (url) => {
             window.location = url;
-          }
+        }
+
+        function start_loading() {
+            spinnerContainer.classList.remove('d-none');
+        }
+
+        function end_loading(){
+            spinnerContainer.classList.add('d-none');
+        }
+
+        window.addEventListener('load', () => {
+            end_loading();
+        })
     </script>
     
     {% block scripts %}

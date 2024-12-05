@@ -61,18 +61,19 @@ def questions(request, category_id=None):
                 if(key.startswith('question-')) and value:
                     question_id = key.split('-')[1]
 
-                    # if value:
                     question = Question.objects.get(id=question_id)
-                    correct_opt = question.correct_opt
+                    correct_opt = question.correct_opt.strip()
                     user_response, created = UserResponse.objects.get_or_create(user=user, question=question)
-                    user_response.selected_option = value
+                    user_response.selected_option = value.strip()
                     user_response.save()
-                    if value == correct_opt:
+                    if value.strip() == correct_opt.strip():
+                        print('1')
                         score += 1
+                    print('score : ', score, value.strip() == correct_opt.strip(), value)
 
-                user_result, created = UserResult.objects.get_or_create(user=user, category=category, question_paper_no=page_number)
-                user_result.score = score
-                user_result.save()
+            user_result, created = UserResult.objects.get_or_create(user=user, category=category, question_paper_no=page_number)
+            user_result.score = score
+            user_result.save()
 
             return redirect('result', category_id=category.id)
 

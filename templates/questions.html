@@ -4,6 +4,7 @@
 
 {% block title %}
 
+<meta name="username" content="{{user}}">
 <title>Front Page</title>
 <link rel="stylesheet" href="{% static 'css/questions.css' %}">
 
@@ -20,7 +21,7 @@
             <!-- User Card -->
             <div class="card bg-transperent shadow" id="user-card">
                 <div class="card-body">
-                    <h2 class="card-title text-light fw-bold" id="user"></h2>
+                    <h2 class="card-title text-light fw-bold" id="user">Hi {{user}}...</h2>
                     <div class="d-flex flex-column">
                         <p class="card-text text-light" style="font-size: 18px;">&nbsp;Hey {{user}} ! Ready to turn
                             learning into game ? Our quizzes are tailored just for you. Dive in, challenge yourself, and
@@ -47,33 +48,33 @@
                             <div class="row d-flex justify-content-between">
                                 <!-- First Option -->
                                 <div class="col-12 col-md-6 my-1 d-flex align-items-center">
-                                    <input type="radio" name="question-{{question.id}}" id="{{question.opt1}}"
+                                    <input type="radio" name="question-{{question.id}}" id="{{question.id}}_1"
                                         class="form-check-input" value="{{question.opt1}}">
-                                    <label for="{{question.opt1}}" class="fs-5 px-2 ms-2">{{question.opt1}}</label>
+                                    <label for="{{question.id}}_1" class="fs-5 px-2 ms-2">{{question.opt1}}</label>
                                 </div>
                                 <!-- End First Option -->
 
                                 <!-- Second Option -->
                                 <div class="col-5 my-1 d-flex align-items-center">
-                                    <input type="radio" name="question-{{question.id}}" id="{{question.opt2}}"
+                                    <input type="radio" name="question-{{question.id}}" id="{{question.id}}_2"
                                         class="form-check-input" value="{{question.opt2}}">
-                                    <label for="{{question.opt2}}" class="fs-5 px-2 ms-2">{{question.opt2}}</label>
+                                    <label for="{{question.id}}_2" class="fs-5 px-2 ms-2">{{question.opt2}}</label>
                                 </div>
                                 <!-- end Second Option -->
 
                                 <!-- Third Option -->
                                 <div class="col-5 my-1 d-flex align-items-center">
-                                    <input type="radio" name="question-{{question.id}}" id="{{question.opt3}}"
+                                    <input type="radio" name="question-{{question.id}}" id="{{question.id}}_3"
                                         class="form-check-input" value="{{question.opt3}}">
-                                    <label for="{{question.opt3}}" class="fs-5 px-2 ms-2">{{question.opt3}}</label>
+                                    <label for="{{question.id}}_3" class="fs-5 px-2 ms-2">{{question.opt3}}</label>
                                 </div>
                                 <!-- End Third Option -->
 
                                 <!-- Fourth Option -->
                                 <div class="col-5 my-1 d-flex align-items-center">
-                                    <input type="radio" name="question-{{question.id}}" id="{{question.opt4}}"
+                                    <input type="radio" name="question-{{question.id}}" id="{{question.id}}_4"
                                         class="form-check-input" value="{{question.opt4}}">
-                                    <label for="{{question.opt4}}" class="fs-5 px-2 ms-2">{{question.opt4}}</label>
+                                    <label for="{{question.id}}_4" class="fs-5 px-2 ms-2">{{question.opt4}}</label>
                                 </div>
                                 <!-- End Fourth Option -->
                             </div>
@@ -83,7 +84,7 @@
                     {% endfor %}
                 </div>
                  <button type="submit" class="btn btn-danger shadow px-5 d-flex align-items-center flex-end" 
-                    >
+                    id="submit-btn">
                     submit <i class="fa-solid fa-circle-arrow-right ms-2"></i> 
                 </button>
             </form>
@@ -100,68 +101,68 @@
 <!-- Typed Js File -->
 <script src="{% static 'js/typed.umd.js' %}"></script>
 
-<!-- Some Information -->
-<script>
-    let user_name = "{{user|escapejs}}"
-    // User Name With Typing Animation
-    let type_user = `Hi ${user_name}...`
-</script>
 
 <!-- Questions Js File -->
-<!-- <script src="{% static 'js/questions.js' %}"></script> -->
+<script src="{% static 'js/questions.js' %}"></script>
 <script type="text/javascript">
-var timer;
+// const questionsForm = document.getElementById('questionsForm');
+// const userMeta = document.querySelector('meta[name="username"]');
+// var timer;
 
-//  Animation
-window.addEventListener('load', () => {
+// //  Animation
+// window.addEventListener('load', () => {
+//     const type_user = `Hi ${userMeta.content}...`;
 
-    setTimeout(() => {
-        $("#user-card").addClass('animate')
-        let typed = new Typed("#user", {
-            strings: [type_user],
-            typeSpeed: 90,
-            backSpeed: 90,
-            showCursor: false
-        })
-        $('#user').addClass('typing')
-    }, 2800);
-})
+//     setTimeout(() => {
+//         $("#user-card").addClass('animate');
+//         let typed = new Typed("#user", {
+//             strings: [type_user],
+//             typeSpeed: 90,
+//             backSpeed: 90,
+//             showCursor: false
+//         })
+//         $('#user').addClass('typing');
+//     }, 2800);
+// })
 
-const questionsForm = document.getElementById('questionsForm')
 
-// Showing questions cards
-$('#start-btn').click((e) => {
+// // Showing questions cards
+// $('#start-btn').click((e) => {
 
-    e.target.disabled = true
-    scrollTo(0, document.body.scrollHeight)
-    questionsForm.classList.remove('d-none')
+//     e.target.disabled = true
+//     scrollTo(0, document.body.scrollHeight)
+//     questionsForm.classList.remove('d-none')
 
-    $('.timer').removeClass('d-none')
-    let minutes = 9, seconds = 60
-    timer = setInterval(() => {
-        seconds--
-        if (seconds < 0) {
-            minutes--
-            seconds = 59
-        }
-        displayTimer(seconds, minutes)
-        if (minutes == 0 && seconds == 0) {
-            clearInterval(timer)
-            $('.spinner').removeClass('d-none')
-            questionsForm.submit();
-        }
-    }, 100);
-})
-function displayTimer(ss, mm) {
-    if (mm == 0 && ss <= 59) {
-        $('.minutes').addClass('text-danger')
-        $('.seconds').addClass('text-danger')
-    }
-    mm = mm <= 9 ? '0' + mm : mm
-    ss = ss <= 9 ? '0' + ss : ss
-    $('.minutes').text(mm + " : ")
-    $('.seconds').text(ss)
-}
+//     $('.timer').removeClass('d-none')
+//     let minutes = 9, seconds = 60
+//     timer = setInterval(() => {
+//         seconds--
+//         if (seconds < 0) {
+//             minutes--
+//             seconds = 59
+//         }
+//         displayTimer(seconds, minutes)
+//         if (minutes == 0 && seconds == 0) {
+//             clearInterval(timer)
+//             $('.spinner').removeClass('d-none')
+//             questionsForm.submit();
+//         }
+//     }, 100);
+// })
+// function displayTimer(ss, mm) {
+//     if (mm == 0 && ss <= 59) {
+//         $('.minutes').addClass('text-danger')
+//         $('.seconds').addClass('text-danger')
+//     }
+//     mm = mm <= 9 ? '0' + mm : mm
+//     ss = ss <= 9 ? '0' + ss : ss
+//     $('.minutes').text(mm + " : ")
+//     $('.seconds').text(ss)
+// }
+    const submitBtn = document.getElementById('submit-btn');
+    questionsForm.addEventListener('submit', () => {
+        clearInterval(timer);
+    })
 
 </script>
 {% endblock scripts %}

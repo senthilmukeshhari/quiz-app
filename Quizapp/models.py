@@ -8,7 +8,7 @@ class NewUser(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
-    image = models.ImageField(upload_to="caategory/related_images/",null=True, blank=True)
+    image = models.ImageField(upload_to="category/",null=True, blank=True)
 
     def __str__(self):
         return self.name
